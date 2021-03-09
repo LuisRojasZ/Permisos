@@ -1,6 +1,8 @@
 package com.example.appi_002;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -21,6 +23,9 @@ public class SegundoActivity extends AppCompatActivity {
     private ImageButton btnnumero;
     private  ImageButton  botonexplorador;
 
+    private final int PHONE_CALL_CODE=100;
+    private final int CAMERA_CALL_CODE=120;
+
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +44,9 @@ public class SegundoActivity extends AppCompatActivity {
                 {
                     if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M)
                     {
-                        versionNueva();
-                    }else {
+                        requestPermissions(new String[]{Manifest.permission.CALL_PHONE},PHONE_CALL_CODE);
+                    }
+                    else {
                         versionesAnteriores(num);
                     }
                 }
@@ -59,7 +65,31 @@ public class SegundoActivity extends AppCompatActivity {
 
             }
         });
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        switch (requestCode)
+        {
+            case PHONE_CALL_CODE:
+                String permission = permissions[0];
+                int result = grantResults[0];
+                if(permission.equals(Manifest.permission.CALL_PHONE)){
 
+
+                    if(result==PackageManager.PERMISSION_GRANTED)
+                    {
+                        String phoneNumber=editTextNumero.getText().toString();
+                        Intent llamada = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+phoneNumber));
+                        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)!=PackageManager.PERMISSION_GRANTED);
+                        startActivity(llamada);
+                    }
+                    else {
+                        Toast.makeText(this, "No aceptaste el permiso", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+        }
     }
     private  boolean verificarpermisos (String permiso)
     {
